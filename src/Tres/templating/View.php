@@ -2,6 +2,10 @@
 
 namespace Tres\templating {
     
+    use Exception;
+    
+    class ViewException extends Exception {}
+    
     class View {
         
         /**
@@ -51,12 +55,19 @@ namespace Tres\templating {
             
             self::$rootURI = rtrim(self::$rootURI, '/').'/';
             
+            if(!self::exists($this->_view)){
+                throw new ViewException('View '.$this->_view.' is not readable. Does it exist?');
+            }
+            
             ob_start();
             require_once(self::$rootURI.$this->_view.self::VIEW_EXTENSION);
             $this->_content = ob_get_contents();
             ob_end_clean();
         }
         
+        /**
+         * Displays the view.
+         */
         public function __destruct(){
             echo $this->_content;
         }
@@ -71,6 +82,16 @@ namespace Tres\templating {
          */
         public static function make($view, array $data = []){
             return new static($view, $data);
+        }
+        
+        /**
+         * Tells whether a view exists or not.
+         * 
+         * @param  string $view The URI to the view.
+         * @return bool
+         */
+        public static function exists($view){
+            return is_readable(self::$rootURI.$view.self::VIEW_EXTENSION);
         }
         
     }
