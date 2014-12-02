@@ -49,7 +49,7 @@ namespace Tres\templating {
          * 
          * @return $this  To make method chaining available.
          */
-        public function __construct($view, array $data = []){
+        public function __construct($view, array $data = array()){
             $this->_view = $view;
             $this->_data = $data;
             
@@ -80,7 +80,7 @@ namespace Tres\templating {
          * 
          * @return Tres\templating\View To make method chaining available.
          */
-        public static function make($view, array $data = []){
+        public static function make($view, array $data = array()){
             return new static($view, $data);
         }
         
