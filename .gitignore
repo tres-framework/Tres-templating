@@ -1,0 +1,3 @@
+/tests/Whoops/
+/tests/storage/views/*
+!/tests/storage/views/.gitkeep
