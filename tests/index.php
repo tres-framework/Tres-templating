@@ -5,17 +5,29 @@ use Tres\templating\View;
 use Tres\templating\ViewException;
 
 spl_autoload_register(function($class){
-    $file = dirname(__DIR__).'/src/'.str_replace('\\', '/', $class.'.php');
+    $dirs = [
+        dirname(__DIR__).'/src/',
+        dirname(__DIR__).'/tests/',
+    ];
     
-    require_once($file);
+    foreach($dirs as $dir){
+        $file = str_replace('\\', '/', $dir.$class.'.php');
+        
+        if(is_readable($file)){
+            require_once($file);
+        }
+    }
 });
+
+if(is_readable(dirname(__DIR__).'/tests/Whoops/Run.php')){
+    $whoops = new Whoops\Run;
+    $whoops->pushHandler(new Whoops\Handler\PrettyPageHandler);
+    $whoops->register();
+}
 
 View::$rootURI = __DIR__.'/views/';
 
 $page = (isset($_GET['page'])) ? $_GET['page'] : 'home';
-
-var_dump(View::exists('home'));
-var_dump(View::exists('error-404'));
 
 switch($page){
     case 'home':

@@ -13,14 +13,28 @@ namespace Tres\templating {
          * 
          * @var string
          */
-        public static $rootURI = '';
+        public static $rootURI = ''; // TODO: Support multiple directories.
         
         /**
-         * The URI to the view.
+         * The directory to store compiled views.
          * 
          * @var string
          */
-        protected $_view = '';
+        public static $storageDir = '';
+        
+        /**
+         * The uncompiled view.
+         * 
+         * @var string
+         */
+        protected $_file = '';
+        
+        /**
+         * The compiled view.
+         * 
+         * @var string
+         */
+        protected $_compiledFile = '';
         
         /**
          * The data to pass to the view.
@@ -42,34 +56,61 @@ namespace Tres\templating {
         const VIEW_EXTENSION = '.php';
         
         /**
+         * The extension of the views.
+         */
+        const STORAGE_DIR_PERMISSIONS = 0777;
+        
+        /**
          * Initializes the class.
          * 
          * @param  string $view The URI of the view.
          * @param  array  $data The data to pass to the view.
-         * 
-         * @return $this  To make method chaining available.
          */
         public function __construct($view, array $data = array()){
-            $this->_view = $view;
+            self::$rootURI = rtrim(self::$rootURI, '/').'/';
+            self::$storageDir = (empty(self::$storageDir)) ? 'storage/views' : self::$storageDir; 
+            self::$storageDir = rtrim(self::$storageDir, '/').'/';
+            
+            $this->_file = self::$rootURI.$view.self::VIEW_EXTENSION;
             $this->_data = $data;
             
-            self::$rootURI = rtrim(self::$rootURI, '/').'/';
-            
-            if(!self::exists($this->_view)){
-                throw new ViewException('View '.$this->_view.' is not readable. Does it exist?');
+            if(!self::exists($this->_file)){
+                throw new ViewException('View '.$this->_file.' is not readable. Does it exist?');
             }
             
             ob_start();
-            require_once(self::$rootURI.$this->_view.self::VIEW_EXTENSION);
+            require_once($this->_file);
             $this->_content = ob_get_contents();
             ob_end_clean();
+            
+            $this->_compiledFile = self::$storageDir.md5($this->_file);
+            
+            if($this->_isExpired()){
+                if(!file_exists(self::$storageDir)){
+                    mkdir(self::$storageDir, self::STORAGE_DIR_PERMISSIONS, true);
+                }
+                
+                $compiledContent = (new Compiler($this->_content))->getCompiledContent();
+                
+                if(is_writable(self::$storageDir)){
+                    if($fileHandle = fopen($this->_compiledFile, 'w')){
+                        //chmod($file, self::VIEW_PERMISSIONS);
+                        fwrite($fileHandle, $compiledContent);
+                        fclose($fileHandle);
+                    }
+                } else {
+                    throw new LogException('Cannot create/write to '.self::$storageDir.'. Permission denied.');
+                }
+            } else {
+                $this->_compiledFile = self::$storageDir.md5($this->_file);
+            }
         }
         
         /**
          * Displays the view.
          */
         public function __destruct(){
-            echo $this->_content;
+            require_once($this->_compiledFile);
         }
         
         /**
@@ -85,13 +126,26 @@ namespace Tres\templating {
         }
         
         /**
-         * Tells whether a view exists or not.
+         * Tells whether a file exists and is readable or not.
          * 
-         * @param  string $view The URI to the view.
+         * @param  string $file The file.
          * @return bool
          */
-        public static function exists($view){
-            return is_readable(self::$rootURI.$view.self::VIEW_EXTENSION);
+        public static function exists($file){
+            return is_readable($file);
+        }
+        
+        /**
+         * Tells whether the compiled view is expired or not.
+         * 
+         * @return bool
+         */
+        protected function _isExpired(){
+            if(is_readable($this->_compiledFile)){
+                return filemtime($this->_file) >= filemtime($this->_compiledFile);
+            }
+            
+            return true;
         }
         
     }
