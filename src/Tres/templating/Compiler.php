@@ -189,6 +189,26 @@ namespace Tres\templating {
         }
         
         /**
+         * Compiles the else-if statements into valid PHP.
+         *
+         * @param  string $expression
+         * @return string
+         */
+        protected function compileElseif($expression){
+            return "<?php elseif{$expression}: ?>";
+        }
+        
+        /**
+         * Compiles the else statements into valid PHP.
+         *
+         * @param  string $expression
+         * @return string
+         */
+        protected function compileElse($expression){
+            return "<?php else: ?>";
+        }
+        
+        /**
          * Compiles the end-if statements into valid PHP.
          *
          * @param  string $expression

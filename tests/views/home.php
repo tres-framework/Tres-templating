@@ -29,7 +29,11 @@
                 Check!<br />
             @endif
             
-            @if($x == 17)
+            @if($x == 16)
+                $x == {{ $x }}<br />
+            @elseif($x == 18)
+                18.
+            @else
                 @foreach($array as $k => $v)
                     {{ $k }} = {{ $v }}<br />
                 @endforeach
