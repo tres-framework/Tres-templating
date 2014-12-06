@@ -25,9 +25,11 @@
             another comment.
             --}}
             
-            @if(($x == 17 && ($x - 1 == 16 + 1 - 1)))
+            @if(!isset($nonExistantVar))
                 Check!<br />
             @endif
+            
+            <hr />
             
             @if($x == 16)
                 $x == {{ $x }}<br />
@@ -41,6 +43,8 @@
                 X is equal to 17.<br />
             @endif
             
+            <hr />
+            
             {{ $y }}<br />
             {{ $z or 'fallback' }}<br />
             
@@ -51,15 +55,22 @@
             consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
             cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
             proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-            <br />
             
-            {{! $html }}
+            <hr />
+            
+            HTML: {{! $html }}
             
             <hr />
             
             @for($i = 1; $i <= 5; $i++)
                 Your number is: {{ $i }}<br />
             @endfor
+            
+            <hr />
+            
+            @while($x >= 10)
+                Counting down $x: {{ $x-- }}<br />
+            @endwhile
         </p>
     </body>
 </html>

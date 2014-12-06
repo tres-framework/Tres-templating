@@ -239,6 +239,26 @@ namespace Tres\templating {
         }
         
         /**
+         * Compiles the while statements into valid PHP.
+         *
+         * @param  string $expression
+         * @return string
+         */
+        protected function compileWhile($expression){
+            return "<?php while{$expression}: ?>";
+        }
+        
+        /**
+         * Compile the end-while statements into valid PHP.
+         *
+         * @param  string $expression
+         * @return string
+         */
+        protected function compileEndwhile($expression){
+            return '<?php endwhile; ?>';
+        }
+        
+        /**
          * Compiles the foreach statements into valid PHP.
          *
          * @param  string $expression
