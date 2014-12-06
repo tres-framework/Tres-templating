@@ -50,6 +50,12 @@
             <br />
             
             {{! $html }}
+            
+            <hr />
+            
+            @for($i = 1; $i <= 5; $i++)
+                Your number is: {{ $i }}<br />
+            @endfor
         </p>
     </body>
 </html>
