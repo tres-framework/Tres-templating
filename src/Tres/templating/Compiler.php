@@ -107,8 +107,61 @@ namespace Tres\templating {
             return $content;
         }
         
+        /**
+         * Compiles the different kinds of echoes.
+         * 
+         * @param  string $content The uncompiled content.
+         * @return string The compiled content.
+         */
         protected function _compileEchoes($content){
+            $content = $this->_compileRawEchoes($content);
+            $content = $this->_compileEscapedEchoes($content);
+            
             return $content;
+        }
+        
+        /**
+         * Compiles raw echoes.
+         * 
+         * @param  string $content The uncompiled content.
+         * @return string The compiled content.
+         */
+        protected function _compileRawEchoes($content){
+            $pattern = sprintf('/(@)?%s\s*(.+?)\s*%s(\r?\n)?/s', $this->_rawTags[0], $this->_rawTags[1]);
+            $callback = function($matches){
+                $whitespace = empty($matches[3]) ? '' : $matches[3].$matches[3];
+                return $matches[1] ?
+                       substr($matches[0], 1) :
+                       '<?= '.$this->_compileDefaultEchoes($matches[2]).'; ?>'.$whitespace;
+            };
+            
+            return preg_replace_callback($pattern, $callback, $content);
+        }
+        
+        /**
+         * Compiles escaped echoes.
+         * 
+         * @param  string $content The uncompiled content.
+         * @return string The compiled content.
+         */
+        protected function _compileEscapedEchoes($content){
+            $pattern = sprintf('/%s\s*(.+?)\s*%s(\r?\n)?/s', $this->_escapeTags[0], $this->_escapeTags[1]);
+            $callback = function($matches){
+                $whitespace = empty($matches[2]) ? '' : $matches[2].$matches[2];
+                return '<?= e('.$this->_compileDefaultEchoes($matches[1]).'); ?>'.$whitespace;
+            };
+            
+            return preg_replace_callback($pattern, $callback, $content);
+        }
+        
+        /**
+         * Compiles the default values for the echo statements.
+         *
+         * @param  string $content The uncompiled content.
+         * @return string The compiled content.
+         */
+        public function _compileDefaultEchoes($content){
+            return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $content);
         }
         
     }

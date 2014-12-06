@@ -25,13 +25,21 @@ if(is_readable(dirname(__DIR__).'/tests/Whoops/Run.php')){
     $whoops->register();
 }
 
+function e($str, $flags = ENT_QUOTES, $encoding = 'UTF-8'){
+    return htmlspecialchars($str, $flags, $encoding);
+}
+
 View::$rootURI = __DIR__.'/views/';
 
 $page = (isset($_GET['page'])) ? $_GET['page'] : 'home';
 
 switch($page){
     case 'home':
-        View::make('home');
+        $data = [
+            'html' => '<b>Some</b> <i>HTML</i> <a href="#">here</a>.',
+            'y' => '<script>alert("XSS protection.");</script>',
+        ];
+        View::make('home', $data);
     break;
     
     default:

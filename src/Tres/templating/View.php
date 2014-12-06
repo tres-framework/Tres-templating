@@ -110,6 +110,7 @@ namespace Tres\templating {
          * Displays the view.
          */
         public function __destruct(){
+            extract($this->_data);
             require_once($this->_compiledFile);
         }
         
