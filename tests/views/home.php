@@ -25,9 +25,9 @@
             another comment.
             --}}
             
-            @if(!isset($nonExistantVar))
+            @unless(isset($nonExistantVar))
                 Check!<br />
-            @endif
+            @endunless
             
             <hr />
             
