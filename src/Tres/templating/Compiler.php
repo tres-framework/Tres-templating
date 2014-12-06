@@ -103,8 +103,22 @@ namespace Tres\templating {
             return preg_replace($pattern, '<?php /*$1*/ ?>', $content);
         }
         
+        /**
+         * Compiles statements into valid PHP.
+         *  
+         * @param  string $content The uncompiled content.
+         * @return string The compiled content.
+         */
         protected function _compileStatements($content){
-            return $content;
+            $callback = function($match){
+                if(method_exists($this, $method = 'compile'.ucfirst($match[1]))){
+                    $match[0] = $this->$method(array_get($match, 3));
+                }
+                
+                return isset($match[3]) ? $match[0] : $match[0].$match[2];
+            };
+            
+            return preg_replace_callback('/\B@(\w+)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', $callback, $content);
         }
         
         /**
@@ -162,6 +176,46 @@ namespace Tres\templating {
          */
         public function _compileDefaultEchoes($content){
             return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $content);
+        }
+        
+        /**
+         * Compiles the if statements into valid PHP.
+         *
+         * @param  string $expression
+         * @return string
+         */
+        protected function compileIf($expression){
+            return "<?php if{$expression}: ?>";
+        }
+        
+        /**
+         * Compiles the end-if statements into valid PHP.
+         *
+         * @param  string $expression
+         * @return string
+         */
+        protected function compileEndif($expression){
+            return '<?php endif; ?>';
+        }
+        
+        /**
+         * Compiles the foreach statements into valid PHP.
+         *
+         * @param  string $expression
+         * @return string
+         */
+        protected function compileForeach($expression){
+            return "<?php foreach{$expression}: ?>";
+        }
+        
+        /**
+         * Compiles the end-if statements into valid PHP.
+         *
+         * @param  string $expression
+         * @return string
+         */
+        protected function compileEndforeach($expression){
+            return '<?php endforeach; ?>';
         }
         
     }

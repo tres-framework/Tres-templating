@@ -109,10 +109,10 @@ namespace Tres\templating {
         /**
          * Displays the view.
          */
-        public function __destruct(){
-            extract($this->_data);
-            require_once($this->_compiledFile);
-        }
+        // public function __destruct(){
+           // extract($this->_data);
+           // require_once($this->_compiledFile);
+        // }
         
         /**
          * Instantiates the class.
@@ -123,7 +123,10 @@ namespace Tres\templating {
          * @return Tres\templating\View To make method chaining available.
          */
         public static function make($view, array $data = array()){
-            return new static($view, $data);
+            $static = new static($view, $data);
+            
+            extract($static->_data);
+            require_once($static->_compiledFile);
         }
         
         /**

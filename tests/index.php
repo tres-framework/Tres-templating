@@ -29,6 +29,26 @@ function e($str, $flags = ENT_QUOTES, $encoding = 'UTF-8'){
     return htmlspecialchars($str, $flags, $encoding);
 }
 
+function array_get($array, $key, $default = null){
+    if(is_null($key)){
+        return $array;
+    }
+    
+    if(isset($array[$key])){
+        return $array[$key];
+    }
+    
+    foreach(explode('.', $key) as $segment){
+        if(!is_array($array) || ! array_key_exists($segment, $array)){
+            return $default;
+        }
+        
+        $array = $array[$segment];
+    }
+    
+    return $array;
+}
+
 View::$rootURI = __DIR__.'/views/';
 
 $page = (isset($_GET['page'])) ? $_GET['page'] : 'home';
@@ -37,6 +57,13 @@ switch($page){
     case 'home':
         $data = [
             'html' => '<b>Some</b> <i>HTML</i> <a href="#">here</a>.',
+            'array' => [
+                'first key' => 'has a value',
+                'second key' => 'has also a value',
+                '3rd key' => 'as well',
+                '4th key',
+            ],
+            'x' => 17,
             'y' => '<script>alert("XSS protection.");</script>',
         ];
         View::make('home', $data);

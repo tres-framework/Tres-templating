@@ -25,9 +25,13 @@
             another comment.
             --}}
             
-            @if($x = 17):
-                @foreach(range(3, 5) as $y):
-                    {{-- $y --}}<br />
+            @if(($x == 17 && ($x - 1 == 16 + 1 - 1)))
+                Check!<br />
+            @endif
+            
+            @if($x == 17)
+                @foreach($array as $k => $v)
+                    {{ $k }} = {{ $v }}<br />
                 @endforeach
                 
                 X is equal to 17.<br />
