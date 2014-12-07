@@ -99,7 +99,7 @@ namespace Tres\templating {
                         fclose($fileHandle);
                     }
                 } else {
-                    throw new LogException('Cannot create/write to '.self::$storageDir.'. Permission denied.');
+                    throw new ViewException('Cannot create/write to '.self::$storageDir.'. Permission denied.');
                 }
             } else {
                 $this->_compiledFile = self::$storageDir.md5($this->_file);
