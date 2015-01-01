@@ -83,10 +83,10 @@ namespace Tres\templating {
             $this->_content = ob_get_contents();
             ob_end_clean();
             
-            $this->_compiledFile = self::$storageDir.md5($this->_file);
+            $this->_compiledFile = self::$storageDir.md5($this->_file).'.php';
             
             if($this->_isExpired()){
-                if(!file_exists(self::$storageDir)){
+                if(!is_dir(self::$storageDir)){
                     mkdir(self::$storageDir, self::STORAGE_DIR_PERMISSIONS, true);
                 }
                 
@@ -94,25 +94,14 @@ namespace Tres\templating {
                 
                 if(is_writable(self::$storageDir)){
                     if($fileHandle = fopen($this->_compiledFile, 'w')){
-                        //chmod($file, self::VIEW_PERMISSIONS);
                         fwrite($fileHandle, $compiledContent);
                         fclose($fileHandle);
                     }
                 } else {
                     throw new ViewException('Cannot create/write to '.self::$storageDir.'. Permission denied.');
                 }
-            } else {
-                $this->_compiledFile = self::$storageDir.md5($this->_file);
             }
         }
-        
-        /**
-         * Displays the view.
-         */
-        // public function __destruct(){
-           // extract($this->_data);
-           // require_once($this->_compiledFile);
-        // }
         
         /**
          * Instantiates the class.
